@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace AppSharp_3
 {
@@ -6,7 +7,7 @@ namespace AppSharp_3
     {
         static void Main()
         {
-            Stack<Tuple<int, int>> _path = new Stack<Tuple<int, int>>();
+            
 
             int[,] labirynth1 = new int[,]
             {
@@ -15,50 +16,52 @@ namespace AppSharp_3
                 {1, 0, 1, 1, 1, 0, 1 },
                 {0, 0, 0, 0, 1, 0, 0 },
                 {1, 1, 0, 0, 1, 1, 1 },
-                {1, 1, 1, 0, 1, 1, 1 },
-                {1, 1, 1, 0, 1, 1, 1 }
+                {1, 1, 1, 0, 0, 0, 0 },
+                {1, 1, 1, 0, 1, 0, 1 }
             };
 
-            FindPath(1, 1);
+            int result = HasExit(1, 1, labirynth1);
 
-
-            bool FindPath(int i, int j)
-            {
-                Console.WriteLine(labirynth1[i, j]);
-                if (labirynth1[i, j] == 0) _path.Push(new(i, j));
-
-                while (_path.Count > 0)
-                {
-                    var current = _path.Pop();
-
-                    Console.WriteLine($"{current.Item1},{current.Item2} ");
-                    if (labirynth1[current.Item1, current.Item2] == 2)
-                    {
-                        Console.WriteLine($"Путь найден {current.Item1},{current.Item2} ");
-                        return true;
-                    }
-
-                    labirynth1[current.Item1, current.Item2] = 1;
-
-                    if (current.Item1 + 1 < labirynth1.GetLength(0)
-                    && labirynth1[current.Item1 + 1, current.Item2] != 1)
-                        _path.Push(new(current.Item1 + 1, current.Item2));
-
-                    if (current.Item2 + 1 < labirynth1.GetLength(1) &&
-                    labirynth1[current.Item1, current.Item2 + 1] != 1)
-                        _path.Push(new(current.Item1, current.Item2 + 1));
-
-                    if (current.Item1 > 0 && labirynth1[current.Item1 - 1, current.Item2] != 1)
-                        _path.Push(new(current.Item1 - 1, current.Item2));
-
-                    if (current.Item2 > 0 && labirynth1[current.Item1, current.Item2 - 1] != 1)
-                        _path.Push(new(current.Item1, current.Item2 - 1));
-                }
-
-                Console.WriteLine("Пути нет");
-                return false;
-
+            Console.WriteLine($"Количество выходов: {result}");
+            Console.WriteLine(result>0?"Всё хорошо. Можно выйти!":"Нас замуровали!!!");
+        }
+        static int HasExit(int startI, int startJ, int[,] l)
+        {
+            Stack<Tuple<int, int>> _path = new Stack<Tuple<int, int>>();
+            
+            int numOfExits = 0;
+            if (l[startI, startJ] != 0)
+            {                
+                return numOfExits; 
             }
+            if (l[startI, startJ] == 0) _path.Push(new(startI, startJ));
+
+            while (_path.Count > 0)
+            {
+                var current = _path.Pop();
+
+                //Console.WriteLine($"{current.Item1},{current.Item2} ");
+                
+                l[current.Item1, current.Item2] = 1;
+
+                if (current.Item1 + 1 < l.GetLength(0) && l[current.Item1 + 1, current.Item2] == 0)
+                    _path.Push(new(current.Item1 + 1, current.Item2));
+
+                if (current.Item2 + 1 < l.GetLength(1) && l[current.Item1, current.Item2 + 1] == 0)
+                    _path.Push(new(current.Item1, current.Item2 + 1));
+
+                if (current.Item1 > 0 && l[current.Item1 - 1, current.Item2] == 0)
+                    _path.Push(new(current.Item1 - 1, current.Item2));
+
+                if (current.Item2 > 0 && l[current.Item1, current.Item2 - 1] == 0)
+                    _path.Push(new(current.Item1, current.Item2 - 1));
+
+                if (current.Item1 + 1 == l.GetLength(0)) numOfExits++;
+                if (current.Item2 + 1 == l.GetLength(1)) numOfExits++;
+                if (current.Item1 == 0) numOfExits++;
+                if (current.Item2 == 0) numOfExits++;
+            }
+            return numOfExits;
         }
     }
 }
